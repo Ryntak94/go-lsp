@@ -1,5 +1,7 @@
 package main
 
 func main() {
-	print("Started")
+	for true {
+		print("1")
+	}
 }
