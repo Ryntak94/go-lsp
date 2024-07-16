@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/Ryntak94/go-lsp.git/internal/lsp"
 	"github.com/Ryntak94/go-lsp.git/internal/rpc"
@@ -15,7 +16,15 @@ type ResponseMessage struct {
 }
 
 func main() {
-	logger := getLogger("../../logs/log.txt")
+	path, err := os.Getwd()
+
+	if err != nil {
+		panic(err)
+	}
+
+	pathToLogger := path[:strings.Index(path, "/go-lsp")+7] + "/logs/log.txt"
+
+	logger := getLogger(pathToLogger)
 	logger.Println("Started...")
 
 	scanner := bufio.NewScanner(os.Stdin)
@@ -44,7 +53,6 @@ func handleMessage(logger *log.Logger, method string, contents []byte) {
 
 func getLogger(filename string) *log.Logger {
 	logfile, err := os.OpenFile(filename, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
-
 	if err != nil {
 		panic("hey, you didn't give me a good file")
 	}
