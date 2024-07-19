@@ -62,11 +62,9 @@ func getLogger(filename string) *log.Logger {
 
 func initialize(logger *log.Logger, method string, contents []byte) {
 	var request lsp.InitializeRequest
-
 	if err := json.Unmarshal(contents, &request); err != nil {
 		logger.Printf("Could not parse message content: %s", err)
 	}
-
 	logger.Printf("Connected to: %s %s",
 		request.Params.ClientInfo.Name,
 		*request.Params.ClientInfo.Version)
