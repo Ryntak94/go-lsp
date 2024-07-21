@@ -63,6 +63,8 @@ func handleMessage(logger *log.Logger, method string, contents []byte) {
 		logger.Printf("shutdown message received")
 	case "exit":
 		logger.Printf("exit message received")
+	default:
+		logger.Printf("No handling for message with method: %s", method)
 	}
 
 }
