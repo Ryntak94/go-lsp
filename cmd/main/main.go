@@ -33,7 +33,7 @@ func main() {
 
 	keywordTree := keywords.GenerateKeywords(logger)
 	for _, keyword := range keywordTree.FindWords() {
-		_ = keyword
+		println(keyword.Name())
 	}
 	for scanner.Scan() {
 		msg := scanner.Bytes()
