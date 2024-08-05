@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Ryntak94/go-lsp.git/internal/keywords"
+	"github.com/Ryntak94/go-lsp.git/internal/document_sync"
 	"github.com/Ryntak94/go-lsp.git/internal/lsp"
 	"github.com/Ryntak94/go-lsp.git/internal/rpc"
 )
@@ -31,10 +31,10 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(rpc.Split)
 
-	keywordTree := keywords.GenerateKeywords(logger)
-	for _, keyword := range keywordTree.FindWords() {
-		_ = keyword
-	}
+	//keywordTree := keywords.GenerateKeywords(logger)
+	//logger.Println(keywordTree)
+	//_:= keywordTree
+
 	for scanner.Scan() {
 		msg := scanner.Bytes()
 
@@ -68,6 +68,9 @@ func handleMessage(logger *log.Logger, method string, contents []byte) {
 		logger.Printf("shutdown message received")
 	case "exit":
 		logger.Printf("exit message received")
+	case "textDocument/didOpen":
+		document_sync.DidOpenHandler(logger, contents)
+		logger.Printf("textDocument/didOpen")
 	default:
 		logger.Printf("No handling for message with method: %s", method)
 	}
