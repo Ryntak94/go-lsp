@@ -48,7 +48,25 @@ func handleMessage(logger *log.Logger, method string, contents []byte) {
 	switch method {
 	case "initialize":
 		initialize(logger, method, contents)
+	// adding stubbing for other lifecycle methods
+	case "initialized":
+		logger.Printf("initialized message received")
+	case "client/registerCapability":
+		logger.Printf("client/registerCapability message received")
+	case "client/unregisterCapability":
+		logger.Printf("client/unregisterCapability messsage received")
+	case "$/setTrace":
+		logger.Printf("$/setTrace message received")
+	case "$/logTrace":
+		logger.Printf("$/logTrace message received")
+	case "shutdown":
+		logger.Printf("shutdown message received")
+	case "exit":
+		logger.Printf("exit message received")
+	default:
+		logger.Printf("No handling for message with method: %s", method)
 	}
+
 }
 
 func getLogger(filename string) *log.Logger {
@@ -62,11 +80,9 @@ func getLogger(filename string) *log.Logger {
 
 func initialize(logger *log.Logger, method string, contents []byte) {
 	var request lsp.InitializeRequest
-
 	if err := json.Unmarshal(contents, &request); err != nil {
 		logger.Printf("Could not parse message content: %s", err)
 	}
-
 	logger.Printf("Connected to: %s %s",
 		request.Params.ClientInfo.Name,
 		*request.Params.ClientInfo.Version)
