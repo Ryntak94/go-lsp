@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/Ryntak94/go-lsp.git/internal/keywords"
 	"github.com/Ryntak94/go-lsp.git/internal/lsp"
 	"github.com/Ryntak94/go-lsp.git/internal/rpc"
 )
@@ -30,6 +31,10 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(rpc.Split)
 
+	keywordTree := keywords.GenerateKeywords(logger)
+	for _, keyword := range keywordTree.FindWords() {
+		_ = keyword
+	}
 	for scanner.Scan() {
 		msg := scanner.Bytes()
 
@@ -47,7 +52,7 @@ func main() {
 func handleMessage(logger *log.Logger, method string, contents []byte) {
 	switch method {
 	case "initialize":
-		initialize(logger, method, contents)
+		initialize(logger, contents)
 	// adding stubbing for other lifecycle methods
 	case "initialized":
 		logger.Printf("initialized message received")
@@ -78,7 +83,7 @@ func getLogger(filename string) *log.Logger {
 	return log.New(logfile, "[go-lsp]", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
-func initialize(logger *log.Logger, method string, contents []byte) {
+func initialize(logger *log.Logger, contents []byte) {
 	var request lsp.InitializeRequest
 	if err := json.Unmarshal(contents, &request); err != nil {
 		logger.Printf("Could not parse message content: %s", err)
