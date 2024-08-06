@@ -1,16 +1,23 @@
 package document_sync
 
-type (
-	DocumentUri string
-)
+import "github.com/Ryntak94/go-lsp.git/internal/lsp"
+
+// type (
+// 	DocumentUri string
+// )
 
 type TextDocumentItem struct {
-	uri        DocumentUri
-	languageId string
-	version    int32
-	text       string
+	Uri        string `json:"uri"`
+	LanguageId string `json:"languageId"`
+	Version    int32  `json:"version"`
+	Text       string `json:"text"`
 }
 
 type DidOpenTextDocumentParams struct {
-	textDocument TextDocumentItem
+	TextDocumentItem TextDocumentItem `json:"textDocument"`
+}
+
+type DidOpenTextMsgJSON struct {
+	DidOpenTextDocumentParams DidOpenTextDocumentParams `json:"params"`
+	Notification              lsp.Notification
 }
