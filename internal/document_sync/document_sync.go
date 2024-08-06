@@ -11,8 +11,8 @@ func DidOpenHandler(logger *log.Logger, contents []byte, stateMap map[string]int
 		logger.Printf("Could not parse message content: %s", err)
 	}
 
-	var languageId = didOpenTextMsgJSON.DidOpenTextDocumentParams.TextDocumentItem.LanguageId
-	var uri string = didOpenTextMsgJSON.DidOpenTextDocumentParams.TextDocumentItem.Uri
+	languageId := didOpenTextMsgJSON.DidOpenTextDocumentParams.TextDocumentItem.LanguageId
+	uri := string(didOpenTextMsgJSON.DidOpenTextDocumentParams.TextDocumentItem.DocumentUri)
 
 	// Throw Error for non go file
 	if languageId != "go" {
