@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Ryntak94/go-lsp.git/internal/keywords"
+	"github.com/Ryntak94/go-lsp.git/internal/document_sync"
 	"github.com/Ryntak94/go-lsp.git/internal/lsp"
 	"github.com/Ryntak94/go-lsp.git/internal/rpc"
 )
@@ -31,10 +31,12 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(rpc.Split)
 
-	keywordTree := keywords.GenerateKeywords(logger)
-	for _, keyword := range keywordTree.FindWords() {
-		_ = keyword
-	}
+	//keywordTree := keywords.GenerateKeywords(logger)
+	//logger.Println(keywordTree)
+	//_:= keywordTree
+
+	stateMap := make(map[string]int)
+
 	for scanner.Scan() {
 		msg := scanner.Bytes()
 
@@ -45,14 +47,14 @@ func main() {
 		}
 
 		logger.Printf("Received message with method: %s", method)
-		handleMessage(logger, method, contents)
+		handleMessage(logger, method, contents, stateMap)
 	}
 }
 
-func handleMessage(logger *log.Logger, method string, contents []byte) {
+func handleMessage(logger *log.Logger, method string, contents []byte, stateMap map[string]int) {
 	switch method {
 	case "initialize":
-		initialize(logger, contents)
+		initialize(logger, contents, stateMap)
 	// adding stubbing for other lifecycle methods
 	case "initialized":
 		logger.Printf("initialized message received")
@@ -68,6 +70,9 @@ func handleMessage(logger *log.Logger, method string, contents []byte) {
 		logger.Printf("shutdown message received")
 	case "exit":
 		logger.Printf("exit message received")
+	case "textDocument/didOpen":
+		document_sync.DidOpenHandler(logger, contents, stateMap)
+		logger.Printf("textDocument/didOpen")
 	default:
 		logger.Printf("No handling for message with method: %s", method)
 	}
@@ -83,7 +88,7 @@ func getLogger(filename string) *log.Logger {
 	return log.New(logfile, "[go-lsp]", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
-func initialize(logger *log.Logger, contents []byte) {
+func initialize(logger *log.Logger, contents []byte, stateMap map[string]int) {
 	var request lsp.InitializeRequest
 	if err := json.Unmarshal(contents, &request); err != nil {
 		logger.Printf("Could not parse message content: %s", err)
@@ -94,6 +99,8 @@ func initialize(logger *log.Logger, contents []byte) {
 
 	msg := lsp.NewInitializeResponse(request.ID)
 	response := rpc.EncodeMessage(msg)
+
+	stateMap["initialized"] = 1
 
 	writer := os.Stdout
 	writer.Write([]byte(response))
